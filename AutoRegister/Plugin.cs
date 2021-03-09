@@ -89,7 +89,7 @@ namespace AutoRegister
                 catch { }
                 tmpPasswords.Remove(player.Name + player.UUID + player.IP);
             }
-            else if (!player.IsLoggedIn)
+            else if (!player.IsLoggedIn && TShock.Config.RequireLogin)
             {
                 player.SendErrorMessage("抱歉, " + player.Name + " 已被注册！");
                 player.SendErrorMessage("请更换角色!");
@@ -102,7 +102,10 @@ namespace AutoRegister
         /// <param name="args"></param>
         void OnServerJoin(JoinEventArgs args)
         {
-            if (TShock.ServerSideCharacterConfig.Enabled)
+            //config.json 中配置 RequireLogin=true 时，就自动注册
+            //而非 开启SSC
+            //TShock.ServerSideCharacterConfig.Enabled
+            if (TShock.Config.RequireLogin)
             {
                 var player = TShock.Players[args.Who];
 
