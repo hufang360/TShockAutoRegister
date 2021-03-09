@@ -30,7 +30,7 @@ namespace AutoRegister
         /// <summary>
         /// The author(s) of the plugin.
         /// </summary>
-        public override string Author => "brian91292";
+        public override string Author => "brian91292（hf修改于2021-03-09）";
 
         /// <summary>
         /// A short, one-line, description of the plugin's purpose.
@@ -76,16 +76,23 @@ namespace AutoRegister
             {
                 try
                 {
-                    player.SendSuccessMessage($"Account \"{player.Name}\" has been registered.");
-                    player.SendSuccessMessage("Your password is " + newPass);
+                    //player.SendSuccessMessage($"Account \"{player.Name}\" has been registered.");
+                    //player.SendSuccessMessage("Your password is " + newPass);
+                    player.SendSuccessMessage("已为你自动注册;-)");
+                    player.SendSuccessMessage("角色：" + player.Name);
+                    player.SendSuccessMessage("密码：" + newPass);
+
+                    TShock.Log.ConsoleInfo("已为你自动注册;-)");
+                    TShock.Log.ConsoleInfo("角色：" + player.Name);
+                    TShock.Log.ConsoleInfo("密码：" + newPass);
                 }
                 catch { }
                 tmpPasswords.Remove(player.Name + player.UUID + player.IP);
             }
             else if (!player.IsLoggedIn)
             {
-                player.SendErrorMessage("Sorry, " + player.Name + " was already taken by another person.");
-                player.SendErrorMessage("Please try a different username.");
+                player.SendErrorMessage("抱歉, " + player.Name + " 已被注册！");
+                player.SendErrorMessage("请更换角色!");
             }
         }
 
@@ -101,7 +108,7 @@ namespace AutoRegister
 
                 if (TShock.UserAccounts.GetUserAccountByName(player.Name) == null && player.Name != TSServerPlayer.AccountName)
                 {
-                    tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 10);
+                    tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 4);
                     TShock.UserAccounts.AddUserAccount(new UserAccount(
                         player.Name,
                         BCrypt.Net.BCrypt.HashPassword(tmpPasswords[player.Name + player.UUID + player.IP].Trim()),
