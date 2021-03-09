@@ -25,12 +25,12 @@ namespace AutoRegister
         /// <summary>
         /// The version of the plugin in its current state.
         /// </summary>
-        public override Version Version => new Version(1, 0, 1);
+        public override Version Version => new Version(1, 1, 0);
 
         /// <summary>
         /// The author(s) of the plugin.
         /// </summary>
-        public override string Author => "brian91292（hf修改于2021-03-09）";
+        public override string Author => "brian91292 · hufang360";
 
         /// <summary>
         /// A short, one-line, description of the plugin's purpose.
@@ -108,7 +108,9 @@ namespace AutoRegister
 
                 if (TShock.UserAccounts.GetUserAccountByName(player.Name) == null && player.Name != TSServerPlayer.AccountName)
                 {
-                    tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 4);
+                    //密码长度改成6位，全为数字，但不包含4和6
+                    //tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 4);
+                    tmpPasswords[player.Name + player.UUID + player.IP] = GenerateRandomNumber(6);
                     TShock.UserAccounts.AddUserAccount(new UserAccount(
                         player.Name,
                         BCrypt.Net.BCrypt.HashPassword(tmpPasswords[player.Name + player.UUID + player.IP].Trim()),
@@ -118,9 +120,22 @@ namespace AutoRegister
                         DateTime.UtcNow.ToString("s"),
                         ""));
 
-                    TShock.Log.ConsoleInfo(player.Name + $" registered an account: \"{player.Name}\"");
+                    TShock.Log.ConsoleInfo(player.Name + $"注册了账户: \"{player.Name}\"");
                 }
             }
+        }
+
+        private static char[] constant = { '0', '1', '2', '3', '5', '7', '8', '9'};
+
+        private static string GenerateRandomNumber(int Length)
+        {
+            System.Text.StringBuilder newRandom = new System.Text.StringBuilder(62);
+            Random rd = new Random();
+            for (int i = 0; i < Length; i++)
+            {
+                newRandom.Append(constant[rd.Next(8)]);
+            }
+            return newRandom.ToString();
         }
 
         /// <summary>

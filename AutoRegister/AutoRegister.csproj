@@ -75,6 +75,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "T:\TShock\TShockAutoRegister\AutoRegister\bin\Debug\AutoRegister.dll" "T:\TShock\1405\TShock4.4.0_Pre12_Terraria1.4.0.5\ServerPlugins\AutoRegister.dll"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
