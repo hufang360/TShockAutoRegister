@@ -1,13 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Terraria;
-using Terraria.Localization;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
-using TShockAPI.Hooks;
-using static TShockAPI.GetDataHandlers;
+
 
 namespace AutoRegister
 {
@@ -25,7 +24,7 @@ namespace AutoRegister
         /// <summary>
         /// The version of the plugin in its current state.
         /// </summary>
-        public override Version Version => new Version(1, 1, 0);
+        public override Version Version => new Version(1, 2, 0);
 
         /// <summary>
         /// The author(s) of the plugin.
@@ -35,7 +34,10 @@ namespace AutoRegister
         /// <summary>
         /// A short, one-line, description of the plugin's purpose.
         /// </summary>
-        public override string Description => "A Tshock plugin to automatically register a new server-side character if one doesn't already exist for a user.";
+        public override string Description => "如果服务器要求登录，会为新用户自动注册和登录。";
+
+        private static string saveFilename = Path.Combine(TShock.SavePath, "AutoRegister.json");
+        private static IPasswordRepository passwordRecords = new JsonPasswordRepository(saveFilename);
 
         /// <summary>
         /// The plugin's constructor
@@ -61,6 +63,7 @@ namespace AutoRegister
         {
             ServerApi.Hooks.ServerJoin.Register(this, OnServerJoin);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer, 420);
+            Commands.ChatCommands.Add(new Command(new List<string>() { "" }, ProcessCommand, "autoregister", "ar"));
         }
 
         private Dictionary<string, string> tmpPasswords = new Dictionary<string, string>();
@@ -71,7 +74,7 @@ namespace AutoRegister
         void OnGreetPlayer(GreetPlayerEventArgs args)
         {
             var player = TShock.Players[args.Who];
-            
+
             if (tmpPasswords.TryGetValue(player.Name + player.UUID + player.IP, out string newPass))
             {
                 try
@@ -85,11 +88,14 @@ namespace AutoRegister
                     TShock.Log.ConsoleInfo("已为你自动注册;-)");
                     TShock.Log.ConsoleInfo("角色：" + player.Name);
                     TShock.Log.ConsoleInfo("密码：" + newPass);
+
+                    // 记录到json
+                    passwordRecords.RecordPassword(player.Name, newPass);
                 }
                 catch { }
                 tmpPasswords.Remove(player.Name + player.UUID + player.IP);
             }
-            else if (!player.IsLoggedIn && TShock.Config.RequireLogin)
+            else if (!player.IsLoggedIn && TShock.Config.RequireLogin && passwordRecords.GetStatus())
             {
                 player.SendErrorMessage("抱歉, " + player.Name + " 已被注册！");
                 player.SendErrorMessage("请更换角色!");
@@ -105,7 +111,7 @@ namespace AutoRegister
             //config.json 中配置 RequireLogin=true 时，就自动注册
             //而非 开启SSC
             //TShock.ServerSideCharacterConfig.Enabled
-            if (TShock.Config.RequireLogin)
+            if ( TShock.Config.RequireLogin && passwordRecords.GetStatus() )
             {
                 var player = TShock.Players[args.Who];
 
@@ -142,9 +148,69 @@ namespace AutoRegister
         }
 
         /// <summary>
-        /// Performs plugin cleanup logic
-        /// Remove your hooks and perform general cleanup here
+        /// 处理命令行指令
         /// </summary>
+        private void ProcessCommand(CommandArgs args)
+        {
+            if (args.Parameters.Count == 0)
+            {
+                ShowHelpText(args);
+                return;
+            }
+
+            switch (args.Parameters[0].ToLowerInvariant())
+            {
+                default:
+                case "help":
+                    ShowHelpText(args);
+                    return;
+
+                case "on":
+                    passwordRecords.SetStatus(true);
+                    args.Player.SendInfoMessage("已开启 自动注册功能;-)");
+                    return;
+
+                case "off":
+                    passwordRecords.SetStatus(false);
+                    args.Player.SendInfoMessage("已关闭 自动注册功能");
+                    return;
+                    
+                case "info":
+                    args.Player.SendInfoMessage("已记录 {0} 条数据",passwordRecords.GetCount());
+                    if (passwordRecords.GetStatus())
+                        args.Player.SendInfoMessage("自动注册功能 已开启");
+                    else
+                        args.Player.SendInfoMessage("自动注册功能 已关闭");
+                    return;
+
+                case "player":
+                    if(args.Parameters.Count<2){
+                        args.Player.SendInfoMessage("语法错误，用法：/ar player <playername>");
+                        return;
+                    }
+                    string password = passwordRecords.GetPassword(args.Parameters[1]);
+                    if(password != ""){
+                        args.Player.SendInfoMessage("密码：{0}",password);
+                    }else{
+                        args.Player.SendErrorMessage("用户未找到！");
+                    }
+                    return;
+            }
+
+        }
+
+        /// <summary>
+        /// 命令行说明
+        /// </summary>
+        private void ShowHelpText(CommandArgs args)
+        {
+            args.Player.SendInfoMessage("/ar on，打开自动注册");
+            args.Player.SendInfoMessage("/ar off，关闭自动注册");
+            args.Player.SendInfoMessage("/ar info，服务状态查询");
+            args.Player.SendInfoMessage("/ar player <playername>，查询指定角色的密码");
+            args.Player.SendInfoMessage("/ar = /autoregister");
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
