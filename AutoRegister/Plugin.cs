@@ -63,7 +63,7 @@ namespace AutoRegister
         {
             ServerApi.Hooks.ServerJoin.Register(this, OnServerJoin);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer, 420);
-            Commands.ChatCommands.Add(new Command(new List<string>() { "" }, ProcessCommand, "autoregister", "ar"));
+            Commands.ChatCommands.Add(new Command(new List<string>() { "autoregister" }, ProcessCommand, "autoregister", "ar"));
         }
 
         private Dictionary<string, string> tmpPasswords = new Dictionary<string, string>();
@@ -167,7 +167,7 @@ namespace AutoRegister
 
                 case "on":
                     passwordRecords.SetStatus(true);
-                    args.Player.SendInfoMessage("已开启 自动注册功能;-)");
+                    args.Player.SendSuccessMessage("已开启 自动注册功能;-)");
                     return;
 
                 case "off":
@@ -176,24 +176,28 @@ namespace AutoRegister
                     return;
                     
                 case "info":
-                    args.Player.SendInfoMessage("已记录 {0} 条数据",passwordRecords.GetCount());
+                    args.Player.SendInfoMessage("自动注册情况");
+                    args.Player.SendInfoMessage("记录：{0} 条",passwordRecords.GetCount());
                     if (passwordRecords.GetStatus())
-                        args.Player.SendInfoMessage("自动注册功能 已开启");
+                        args.Player.SendInfoMessage("功能：已开启");
                     else
-                        args.Player.SendInfoMessage("自动注册功能 已关闭");
+                        args.Player.SendInfoMessage("功能：已关闭");
                     return;
 
                 case "player":
-                    if(args.Parameters.Count<2){
-                        args.Player.SendInfoMessage("语法错误，用法：/ar player <playername>");
+                    if(args.Parameters.Count<2)
+                    {
+                        args.Player.SendErrorMessage("语法错误，用法：/ar player <playername>");
                         return;
                     }
                     string password = passwordRecords.GetPassword(args.Parameters[1]);
-                    if(password != ""){
-                        args.Player.SendInfoMessage("密码：{0}",password);
-                    }else{
-                        args.Player.SendErrorMessage("用户未找到！");
+                    if(password != "")
+                    {
+                        args.Player.SendSuccessMessage("角色：{0}", args.Parameters[1]);
+                        args.Player.SendSuccessMessage("密码：{0}", password);
                     }
+                    else
+                        args.Player.SendErrorMessage("用户 {0} 未找到！", args.Parameters[1]);
                     return;
             }
 
