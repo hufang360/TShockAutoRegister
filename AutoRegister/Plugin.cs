@@ -6,6 +6,7 @@ using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
+using System.Reflection;
 
 
 namespace AutoRegister
@@ -16,25 +17,13 @@ namespace AutoRegister
     [ApiVersion(2, 1)]
     public class Plugin : TerrariaPlugin
     {
-        /// <summary>
-        /// The name of the plugin.
-        /// </summary>
         public override string Name => "AutoRegister";
 
-        /// <summary>
-        /// The version of the plugin in its current state.
-        /// </summary>
-        public override Version Version => new Version(1, 2, 0);
-
-        /// <summary>
-        /// The author(s) of the plugin.
-        /// </summary>
-        public override string Author => "brian91292 · hufang360";
-
-        /// <summary>
-        /// A short, one-line, description of the plugin's purpose.
-        /// </summary>
         public override string Description => "如果服务器要求登录，会为新用户自动注册和登录。";
+
+        public override string Author => "brian91292·hufang360";
+
+        public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
         private static string saveFilename = Path.Combine(TShock.SavePath, "AutoRegister.json");
         private static IPasswordRepository passwordRecords = new JsonPasswordRepository(saveFilename);
@@ -95,7 +84,7 @@ namespace AutoRegister
                 catch { }
                 tmpPasswords.Remove(player.Name + player.UUID + player.IP);
             }
-            else if (!player.IsLoggedIn && TShock.Config.RequireLogin && passwordRecords.GetStatus())
+            else if (!player.IsLoggedIn && TShock.Config.Settings.RequireLogin && passwordRecords.GetStatus())
             {
                 player.SendErrorMessage("抱歉, " + player.Name + " 已被注册！");
                 player.SendErrorMessage("请更换角色!");
@@ -111,7 +100,7 @@ namespace AutoRegister
             //config.json 中配置 RequireLogin=true 时，就自动注册
             //而非 开启SSC
             //TShock.ServerSideCharacterConfig.Enabled
-            if ( TShock.Config.RequireLogin && passwordRecords.GetStatus() )
+            if ( TShock.Config.Settings.RequireLogin && passwordRecords.GetStatus() )
             {
                 var player = TShock.Players[args.Who];
 
@@ -124,7 +113,7 @@ namespace AutoRegister
                         player.Name,
                         BCrypt.Net.BCrypt.HashPassword(tmpPasswords[player.Name + player.UUID + player.IP].Trim()),
                         player.UUID,
-                        TShock.Config.DefaultRegistrationGroupName,
+                        TShock.Config.Settings.DefaultRegistrationGroupName,
                         DateTime.UtcNow.ToString("s"),
                         DateTime.UtcNow.ToString("s"),
                         ""));
@@ -185,6 +174,7 @@ namespace AutoRegister
                     return;
 
                 case "player":
+                case "p":
                     if(args.Parameters.Count<2)
                     {
                         args.Player.SendErrorMessage("语法错误，用法：/ar player <playername>");
@@ -212,7 +202,6 @@ namespace AutoRegister
             args.Player.SendInfoMessage("/ar off，关闭自动注册");
             args.Player.SendInfoMessage("/ar info，服务状态查询");
             args.Player.SendInfoMessage("/ar player <playername>，查询指定角色的密码");
-            args.Player.SendInfoMessage("/ar = /autoregister");
         }
 
         protected override void Dispose(bool disposing)
