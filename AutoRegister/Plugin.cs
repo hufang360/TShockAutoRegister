@@ -21,11 +21,12 @@ namespace AutoRegister
 
         public override string Description => "如果服务器要求登录，会为新用户自动注册和登录。";
 
-        public override string Author => "brian91292·hufang360";
+        public override string Author => "brian91292 & hufang360";
 
         public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
         private static string saveFilename = Path.Combine(TShock.SavePath, "AutoRegister.json");
+
         private static IPasswordRepository passwordRecords = new JsonPasswordRepository(saveFilename);
 
         /// <summary>
@@ -108,6 +109,11 @@ namespace AutoRegister
                 {
                     //密码长度改成6位，全为数字，但不包含4和6
                     //tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 4);
+
+                    // 更安全的密码规则
+                    // tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 10).Replace('l', 'L')
+                            // .Replace('1', '7').Replace('I', 'i').Replace('O', 'o').Replace('0', 'o');
+
                     tmpPasswords[player.Name + player.UUID + player.IP] = GenerateRandomNumber(6);
                     TShock.UserAccounts.AddUserAccount(new UserAccount(
                         player.Name,
@@ -163,7 +169,7 @@ namespace AutoRegister
                     passwordRecords.SetStatus(false);
                     args.Player.SendInfoMessage("已关闭 自动注册功能");
                     return;
-                    
+
                 case "info":
                     args.Player.SendInfoMessage("自动注册情况");
                     args.Player.SendInfoMessage("记录：{0} 条",passwordRecords.GetCount());
