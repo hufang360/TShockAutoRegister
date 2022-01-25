@@ -161,29 +161,29 @@ namespace AutoRegister
 
                 case "on":
                     passwordRecords.SetStatus(true);
-                    args.Player.SendSuccessMessage("已开启 自动注册功能;-)");
+                    args.Player.SendSuccessMessage("已开启 自动注册 功能;-)");
                     return;
 
                 case "off":
                     passwordRecords.SetStatus(false);
-                    args.Player.SendInfoMessage("已关闭 自动注册功能");
+                    args.Player.SendInfoMessage("已关闭 自动注册 功能");
                     return;
 
                 case "info":
                     args.Player.SendInfoMessage("自动注册情况");
-                    args.Player.SendInfoMessage("记录：{0} 条", passwordRecords.GetCount());
                     if (passwordRecords.GetStatus())
                         args.Player.SendInfoMessage("功能：已开启");
                     else
                         args.Player.SendInfoMessage("功能：已关闭");
-                    args.Player.SendInfoMessage("用户名："+passwordRecords.GetNameList());
+                    args.Player.SendInfoMessage("记录：{0} 条", passwordRecords.GetCount());
+                    args.Player.SendInfoMessage("用户列表："+passwordRecords.GetNameList());
                     return;
 
                 case "player":
                 case "p":
                     if(args.Parameters.Count<2)
                     {
-                        args.Player.SendErrorMessage("语法错误，用法：/ar player <playername>");
+                        args.Player.SendErrorMessage("语法错误，用法：/ar player <玩家名>");
                         return;
                     }
                     string password = passwordRecords.GetPassword(args.Parameters[1]);
@@ -194,7 +194,7 @@ namespace AutoRegister
                     } else {
                         args.Player.SendErrorMessage("用户 {0} 不是自动注册的，找不到密码记录！", args.Parameters[1]);
                         args.Player.SendErrorMessage("可联系管理员重置密码：");
-                        args.Player.SendErrorMessage("/user password <username> <newpassword>", args.Parameters[1]);
+                        args.Player.SendErrorMessage("/user password <玩家名> <新密码>", args.Parameters[1]);
                     }
                     return;
             }
@@ -213,11 +213,11 @@ namespace AutoRegister
             {
                 args.Player.SendSuccessMessage("你的密码：{0}", password);
                 args.Player.SendSuccessMessage("登录指令：/login {0}", password);
-                args.Player.SendSuccessMessage("改密指令：/password <oldpassword> <newpassword>", password);
+                args.Player.SendSuccessMessage("改密指令：/password <旧密码> <新密码>", password);
             } else {
                 args.Player.SendErrorMessage("用户 {0} 不是自动注册的，找不到密码记录！", args.Player.Name);
                 args.Player.SendErrorMessage("可联系管理员重置密码：");
-                args.Player.SendErrorMessage("/user password <username> <newpassword>", args.Player.Name);
+                args.Player.SendErrorMessage("/user password <玩家名> <新密码>", args.Player.Name);
             }
         }
 
@@ -229,9 +229,9 @@ namespace AutoRegister
             args.Player.SendInfoMessage("/ar on，打开自动注册");
             args.Player.SendInfoMessage("/ar off，关闭自动注册");
             args.Player.SendInfoMessage("/ar info，服务状态查询");
-            args.Player.SendInfoMessage("/ar player <playername>，查询指定角色的密码");
-            args.Player.SendInfoMessage("/mypassword，查询自己的密码（普通用户）");
-            args.Player.SendInfoMessage("/user password <username> <newpassword>，重置某个用户的密码（管理员）");
+            args.Player.SendInfoMessage("/ar player <玩家名>，查询某个玩家的密码");
+            args.Player.SendInfoMessage("/mypassword，查询密码（普通用户）");
+            args.Player.SendInfoMessage("/user password <玩家名> <新密码>，重置密码（管理员）");
         }
 
         protected override void Dispose(bool disposing)

@@ -26,6 +26,15 @@ namespace AutoRegister
             }
         }
 
+        private void Save()
+        {
+            // Record pretty-printed JSON to file.
+            File.WriteAllText(filename, JsonConvert.SerializeObject(ledger, Formatting.Indented));
+
+            //File.WriteAllText(filename, JsonConvert.SerializeObject(ledger, Formatting.Indented,Q
+            //    new JsonConverter[] { new StringEnumConverter() }));
+        }
+
         public string GetPassword(string playerName)
         {
             try
@@ -44,13 +53,7 @@ namespace AutoRegister
                 ledger.records[playerName] = password;
             else
                 ledger.records.Add(playerName, password);
-
-            // Record pretty-printed JSON to file.
-            File.WriteAllText(filename, JsonConvert.SerializeObject(ledger, Formatting.Indented));
-
-            //File.WriteAllText(filename, JsonConvert.SerializeObject(ledger, Formatting.Indented,
-            //    new JsonConverter[] { new StringEnumConverter() }));
-
+            Save();
             return ledger.records[playerName];
         }
 
@@ -60,6 +63,7 @@ namespace AutoRegister
                 ledger.status = 1;
             else
                 ledger.status = 0;
+            Save();
         }
 
         public Boolean GetStatus()
