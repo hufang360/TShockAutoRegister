@@ -5,17 +5,7 @@ using Newtonsoft.Json;
 
 namespace AutoRegister
 {
-    interface IPasswordRepository
-    {
-        string RecordPassword(string playerName, string password);
-        string GetPassword(string playerName);
-        void SetStatus(Boolean isOn);
-        Boolean GetStatus();
-
-        int GetCount();
-    }
-
-    class JsonPasswordRepository : IPasswordRepository
+    class JsonPasswordRepository
     {
         private string filename = string.Empty;
         private readonly PasswordLedger ledger = null;
@@ -82,6 +72,15 @@ namespace AutoRegister
 
         public int GetCount(){
             return ledger.records.Count;
+        }
+        public string GetNameList()
+        {
+            string s = "";
+            foreach (var item in ledger.records)
+            {
+                s += item.Key + ", ";
+            }
+            return s;
         }
     }
 
