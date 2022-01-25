@@ -56,7 +56,7 @@ namespace AutoRegister
             ServerApi.Hooks.ServerJoin.Register(this, OnServerJoin);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer, 420);
             Commands.ChatCommands.Add(new Command(new List<string>() { "autoregister" }, ProcessCommand, "autoregister", "ar"));
-            Commands.ChatCommands.Add(new Command(new List<string>() { "" }, MyPassword, "mypassword", "pwd"));
+            Commands.ChatCommands.Add(new Command(new List<string>() { "mypassword" }, MyPassword, "mypassword", "pwd"));
         }
 
         private Dictionary<string, string> tmpPasswords = new Dictionary<string, string>();
