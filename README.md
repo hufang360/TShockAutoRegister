@@ -18,6 +18,16 @@ Fork至：https://github.com/brian91292/TShockAutoRegister<br>
 
 ar 是 AutoRegister 的缩写
 
+/mypassword, 查看自己的密码（普通用户）<br>
+/pwd, 查看自己的密码（普通用户）简写<br>
+
+<br>
+
+# 和密码相关的指令：
+/password <oldpassword> <newpassword>, 普通用户改密指令<br>
+/user password <username> <newpassword>, 重置一个用户的密码（管理员用，不建议将user权限下放给用户）<br>
+
+<br>
 
 # AutoRegister.json 示例 <br>
 ```json
