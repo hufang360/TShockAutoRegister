@@ -21,7 +21,6 @@ Fork至：https://github.com/brian91292/TShockAutoRegister<br>
 
 /mypassword, 查看自己的密码
 /pwd, 上个指令的简写
-# 这两个指令建议开放给普通用户，授权方式举例：/group addperm default mypassword
 ```
 <br>
 
@@ -35,13 +34,8 @@ Fork至：https://github.com/brian91292/TShockAutoRegister<br>
 # 权限
 ```shell
 autoregister
-mypassword
 ```
 
-授权示例：
-```shell
-/group addperm default mypassword
-```
 
 # AutoRegister.json 示例 <br>
 ```json
