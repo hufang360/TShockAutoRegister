@@ -42,7 +42,7 @@ autoregister
 {
   "records": {
     "hf": "729351",
-    "GoodGoy": "390573"
+    "GoodBoy": "390573"
   },
   "status": 0
 }
