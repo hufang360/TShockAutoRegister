@@ -57,7 +57,7 @@ namespace AutoRegister
             return ledger.records[playerName];
         }
 
-        public void SetStatus(Boolean isOn)
+        public void SetStatus(bool isOn)
         {
             if(isOn)
                 ledger.status = 1;
@@ -66,7 +66,7 @@ namespace AutoRegister
             Save();
         }
 
-        public Boolean GetStatus()
+        public bool GetStatus()
         {
             if(ledger.status == 0)
                 return false;

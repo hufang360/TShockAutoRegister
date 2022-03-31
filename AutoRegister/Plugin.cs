@@ -1,19 +1,16 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
-using System.Reflection;
 
 
 namespace AutoRegister
 {
-    /// <summary>
-    /// The main plugin class should always be decorated with an ApiVersion attribute. The current API Version is 1.25
-    /// </summary>
     [ApiVersion(2, 1)]
     public class Plugin : TerrariaPlugin
     {
@@ -29,10 +26,8 @@ namespace AutoRegister
 
         private static JsonPasswordRepository passwordRecords;
 
-        /// <summary>
-        /// The plugin's constructor
-        /// Set your plugin's order (optional) and any other constructor logic here
-        /// </summary>
+        private static string PermAutoRegister = "autoregister";
+
         public Plugin(Main game) : base(game)
         {
         }
@@ -45,25 +40,17 @@ namespace AutoRegister
             Console.WriteLine($"AutoRegister::{member}({line}): {msg}");
         }
 
-        /// <summary>
-        /// Performs plugin initialization logic.
-        /// Add your hooks, config file read/writes, etc here
-        /// </summary>
         public override void Initialize()
         {
             passwordRecords = new JsonPasswordRepository(saveFilename);
 
             ServerApi.Hooks.ServerJoin.Register(this, OnServerJoin);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer, 420);
-            Commands.ChatCommands.Add(new Command(new List<string>() { "autoregister" }, ProcessCommand, "autoregister", "ar"));
-            Commands.ChatCommands.Add(new Command(new List<string>() { "mypassword" }, MyPassword, "mypassword", "pwd"));
+            Commands.ChatCommands.Add(new Command(new List<string>() { PermAutoRegister }, ProcessCommand, "autoregister", "ar"));
+            Commands.ChatCommands.Add(new Command(new List<string>() { }, MyPassword, "mypassword", "pwd"));
         }
 
         private Dictionary<string, string> tmpPasswords = new Dictionary<string, string>();
-        /// <summary>
-        /// Tell the player their password if the account was newly generated
-        /// </summary>
-        /// <param name="args"></param>
         void OnGreetPlayer(GreetPlayerEventArgs args)
         {
             var player = TShock.Players[args.Who];
@@ -73,8 +60,7 @@ namespace AutoRegister
                 try
                 {
                     player.SendSuccessMessage("已为你自动注册;-)");
-                    player.SendSuccessMessage("角色：" + player.Name);
-                    player.SendSuccessMessage("密码：" + newPass);
+                    player.SendSuccessMessage("输入 /pwd 可查看密码");
 
                     // 记录到json
                     passwordRecords.RecordPassword(player.Name, newPass);
@@ -89,16 +75,12 @@ namespace AutoRegister
             }
         }
 
-        /// <summary>
-        /// Fired when a new user joins the server.
-        /// </summary>
-        /// <param name="args"></param>
         void OnServerJoin(JoinEventArgs args)
         {
             //config.json 中配置 RequireLogin=true 时，就自动注册
             //而非 开启SSC
             //TShock.ServerSideCharacterConfig.Enabled
-            if (Compatible.RequireLogin && passwordRecords.GetStatus() )
+            if (Compatible.RequireLogin && passwordRecords.GetStatus())
             {
                 var player = TShock.Players[args.Who];
 
@@ -109,7 +91,7 @@ namespace AutoRegister
 
                     // 更安全的密码规则
                     // tmpPasswords[player.Name + player.UUID + player.IP] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 10).Replace('l', 'L')
-                            // .Replace('1', '7').Replace('I', 'i').Replace('O', 'o').Replace('0', 'o');
+                    // .Replace('1', '7').Replace('I', 'i').Replace('O', 'o').Replace('0', 'o');
 
                     tmpPasswords[player.Name + player.UUID + player.IP] = GenerateRandomNumber(6);
                     TShock.UserAccounts.AddUserAccount(new UserAccount(
@@ -121,12 +103,12 @@ namespace AutoRegister
                         DateTime.UtcNow.ToString("s"),
                         ""));
 
-                    TShock.Log.ConsoleInfo(player.Name + $"注册了账户 ");
+                    TShock.Log.ConsoleInfo($"已为 {player.Name} 注册了账户 ");
                 }
             }
         }
 
-        private static char[] constant = { '0', '1', '2', '3', '5', '7', '8', '9'};
+        private static char[] constant = { '0', '1', '2', '3', '5', '7', '8', '9' };
 
         private static string GenerateRandomNumber(int Length)
         {
@@ -141,14 +123,22 @@ namespace AutoRegister
 
 
 
-        /// <summary>
-        /// 处理命令行指令
-        /// </summary>
         private void ProcessCommand(CommandArgs args)
         {
+            TSPlayer op = args.Player;
+            void ShowHelpText()
+            {
+                op.SendInfoMessage("/ar on，打开自动注册");
+                op.SendInfoMessage("/ar off，关闭自动注册");
+                op.SendInfoMessage("/ar info，服务状态查询");
+                op.SendInfoMessage("/ar look <玩家名>，查询某个玩家的密码");
+                op.SendInfoMessage("/pwd，查询自己的密码（普通用户）");
+                op.SendInfoMessage("/user password <玩家名> <新密码>，重置密码（管理员）");
+            }
+
             if (args.Parameters.Count == 0)
             {
-                ShowHelpText(args);
+                ShowHelpText();
                 return;
             }
 
@@ -156,7 +146,7 @@ namespace AutoRegister
             {
                 default:
                 case "help":
-                    ShowHelpText(args);
+                    ShowHelpText();
                     return;
 
                 case "on":
@@ -176,22 +166,25 @@ namespace AutoRegister
                     else
                         args.Player.SendInfoMessage("功能：已关闭");
                     args.Player.SendInfoMessage("记录：{0} 条", passwordRecords.GetCount());
-                    args.Player.SendInfoMessage("用户列表："+passwordRecords.GetNameList());
+                    args.Player.SendInfoMessage("用户列表：" + passwordRecords.GetNameList());
                     return;
 
                 case "player":
                 case "p":
-                    if(args.Parameters.Count<2)
+                case "look":
+                    if (args.Parameters.Count < 2)
                     {
-                        args.Player.SendErrorMessage("语法错误，用法：/ar player <玩家名>");
+                        args.Player.SendErrorMessage("语法错误，用法：/ar look <玩家名>");
                         return;
                     }
                     string password = passwordRecords.GetPassword(args.Parameters[1]);
-                    if(password != "")
+                    if (password != "")
                     {
                         args.Player.SendSuccessMessage("角色：{0}", args.Parameters[1]);
                         args.Player.SendSuccessMessage("密码：{0}", password);
-                    } else {
+                    }
+                    else
+                    {
                         args.Player.SendErrorMessage("用户 {0} 不是自动注册的，找不到密码记录！", args.Parameters[1]);
                         args.Player.SendErrorMessage("可联系管理员重置密码：");
                         args.Player.SendErrorMessage("/user password <玩家名> <新密码>", args.Parameters[1]);
@@ -201,38 +194,37 @@ namespace AutoRegister
 
         }
 
+
+        // 查看密码
         private void MyPassword(CommandArgs args)
         {
-            if(!args.Player.RealPlayer){
+            if (!args.Player.RealPlayer)
+            {
                 args.Player.SendErrorMessage("请在游戏内使用此指令");
                 return;
             }
+            if (args.Player.Group.Name == Compatible.DefaultGuestGroupName)
+            {
+                args.Player.SendErrorMessage("游客无法使用此指令");
+                return;
+            }
+
 
             string password = passwordRecords.GetPassword(args.Player.Name);
-            if( password != "" )
+            if (password != "")
             {
                 args.Player.SendSuccessMessage("你的密码：{0}", password);
                 args.Player.SendSuccessMessage("登录指令：/login {0}", password);
                 args.Player.SendSuccessMessage("改密指令：/password <旧密码> <新密码>", password);
-            } else {
+            }
+            else
+            {
                 args.Player.SendErrorMessage("用户 {0} 不是自动注册的，找不到密码记录！", args.Player.Name);
                 args.Player.SendErrorMessage("可联系管理员重置密码：");
                 args.Player.SendErrorMessage("/user password <玩家名> <新密码>", args.Player.Name);
             }
         }
 
-        /// <summary>
-        /// 命令行说明
-        /// </summary>
-        private void ShowHelpText(CommandArgs args)
-        {
-            args.Player.SendInfoMessage("/ar on，打开自动注册");
-            args.Player.SendInfoMessage("/ar off，关闭自动注册");
-            args.Player.SendInfoMessage("/ar info，服务状态查询");
-            args.Player.SendInfoMessage("/ar player <玩家名>，查询某个玩家的密码");
-            args.Player.SendInfoMessage("/mypassword，查询密码（普通用户）");
-            args.Player.SendInfoMessage("/user password <玩家名> <新密码>，重置密码（管理员）");
-        }
 
         protected override void Dispose(bool disposing)
         {

@@ -15,13 +15,12 @@ Fork至：https://github.com/brian91292/TShockAutoRegister<br>
 /ar info，服务状态查询
 /ar on，打开 自动注册 功能
 /ar off，关闭 自动注册 功能
-/ar player <playername>，查询指定角色的密码
+/ar look <玩家名>，查询指定角色的密码
 
 # ar 是 AutoRegister 的缩写
 
 /mypassword, 查看自己的密码
 /pwd, 上个指令的简写
-# 这两个指令建议开放给普通用户，授权方式举例：/group addperm default mypassword
 ```
 <br>
 
@@ -35,13 +34,8 @@ Fork至：https://github.com/brian91292/TShockAutoRegister<br>
 # 权限
 ```shell
 autoregister
-mypassword
 ```
 
-授权示例：
-```shell
-/group addperm default mypassword
-```
 
 # AutoRegister.json 示例 <br>
 ```json
