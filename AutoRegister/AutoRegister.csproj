@@ -14,7 +14,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -32,31 +32,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+
     <Reference Include="Newtonsoft.Json">
-      <HintPath>deps\Newtonsoft.Json.dll</HintPath>
+      <HintPath>deps\144\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="BCrypt.Net">
       <HintPath>deps\BCrypt.Net.dll</HintPath>
     </Reference>
     <Reference Include="OTAPI">
-      <HintPath>deps\1.4.3.2\OTAPI.dll</HintPath>
+      <HintPath>deps\144\OTAPI.dll</HintPath>
     </Reference>
     <Reference Include="TerrariaServer">
-      <HintPath>deps\1.4.3.2\TerrariaServer.exe</HintPath>
+      <HintPath>deps\144\TerrariaServer.dll</HintPath>
     </Reference>
     <Reference Include="TShockAPI">
-      <HintPath>deps\1.4.3.2\TShockAPI.dll</HintPath>
+      <HintPath>deps\144\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
