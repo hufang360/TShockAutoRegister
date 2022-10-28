@@ -33,28 +33,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>deps\144\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="BCrypt.Net">
-      <HintPath>deps\BCrypt.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="OTAPI">
-      <HintPath>deps\144\OTAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TerrariaServer">
-      <HintPath>deps\144\TerrariaServer.dll</HintPath>
-    </Reference>
-    <Reference Include="TShockAPI">
-      <HintPath>deps\144\TShockAPI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Plugin.cs" />
     <Compile Include="PasswordRepository.cs" />
     <Compile Include="Compatible.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="BCrypt.Net-Next, Version=4.0.3.0, Culture=neutral, PublicKeyToken=1e11be04b6288443, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\@lib\1.4.4.7\BCrypt.Net-Next.dll</HintPath>
+    </Reference>
+    <Reference Include="OTAPI, Version=1.4.4.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\@lib\1.4.4.7\OTAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="TerrariaServer, Version=1.4.3.6, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\@lib\1.4.4.7\TerrariaServer.dll</HintPath>
+    </Reference>
+    <Reference Include="TShockAPI, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\@lib\1.4.4.7\TShockAPI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
